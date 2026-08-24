@@ -1,0 +1,355 @@
+@import "tailwindcss";
+
+/*
+  Evi design tokens — implements Design.md.
+
+  Colour, type, spacing, shadow and motion values come from Design.md and are
+  treated as final. Three values are deliberately adjusted for contrast; each
+  is marked A11Y with the measured ratio, because the specified value fails
+  WCAG AA and accessibility is part of the definition of done.
+*/
+@theme {
+  /* ---- Pink — mascot crown, primary brand pink ---- */
+  --color-pink-50: #fef2fa;
+  --color-pink-100: #fce0f4;
+  --color-pink-200: #f9bce8;
+  --color-pink-300: #f68fd6;
+  --color-pink-400: #f169c4;
+  --color-pink-500: #e94fb0;
+  --color-pink-600: #d0349a;
+  --color-pink-700: #a3237a;
+  --color-pink-800: #761a5a;
+  --color-pink-900: #4a1138;
+
+  /* ---- Orange — mascot body, primary brand orange ---- */
+  --color-orange-50: #fff3ec;
+  --color-orange-100: #ffe1cd;
+  --color-orange-200: #ffc199;
+  --color-orange-300: #ff9f68;
+  --color-orange-400: #ff8a52;
+  --color-orange-500: #ff7a45;
+  --color-orange-600: #e85a2c;
+  --color-orange-700: #bb3f1d;
+  --color-orange-800: #8a2f16;
+  --color-orange-900: #591e0e;
+
+  /* ---- Periwinkle — mascot heart, cool secondary. Used sparingly ---- */
+  --color-periwinkle-50: #f1f0fb;
+  --color-periwinkle-100: #e1defa;
+  --color-periwinkle-200: #c5c0f2;
+  --color-periwinkle-300: #a29ce9;
+  --color-periwinkle-400: #8b86e0;
+  --color-periwinkle-500: #7269d3;
+  --color-periwinkle-600: #5b52bf;
+  --color-periwinkle-700: #463e9e;
+  --color-periwinkle-800: #332c73;
+  --color-periwinkle-900: #211c4a;
+
+  /* ---- Cream — mascot eye-ring, warm neutral surfaces ---- */
+  --color-cream-50: #fefcf9;
+  --color-cream-100: #fdf6ec;
+  --color-cream-200: #fbecd7;
+  --color-cream-300: #ffe8c9;
+  --color-cream-400: #f3d4a8;
+  --color-cream-500: #e3ba80;
+
+  /* ---- Neutral — warm-tinted, never pure gray ---- */
+  --color-neutral-0: #ffffff;
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f2f1f3;
+  --color-neutral-150: #e8e7e9;
+  --color-neutral-200: #dddce0;
+  --color-neutral-300: #c6c4ca;
+  --color-neutral-400: #a4a0ab;
+  --color-neutral-500: #837d8c;
+  --color-neutral-600: #65606c;
+  --color-neutral-700: #4b4851;
+  --color-neutral-800: #353239;
+  --color-neutral-900: #232226;
+  --color-neutral-950: #171618;
+  --color-neutral-1000: #0d0c0e;
+
+  /* ---- Danger — standalone, independent of the mascot palette ---- */
+  --color-danger-50: #fdecea;
+  --color-danger-500: #e6432f;
+  --color-danger-700: #a82615;
+
+  /* ---- Semantic surfaces ---- */
+  --color-bg: #f9f8f6;
+  --color-bg-subtle: #f7f3f2;
+  --color-bg-sunken: #ebe7e6;
+  --color-surface: #ffffff;
+  --color-surface-dark: #1c0d20;
+
+  /* ---- Borders ---- */
+  --color-border: #c4c7c7;
+  /*
+    A11Y: --color-border measures 1.70:1 on white, so it cannot delimit an
+    input field (WCAG 1.4.11 requires 3:1). Form controls use border-strong
+    (4.47:1); --color-border stays for decorative rules and dividers.
+  */
+  --color-border-strong: #747878;
+
+  /* ---- Text ---- */
+  --color-text-primary: #1c1b1b;
+  --color-text-secondary: #666666;
+  --color-text-tertiary: #444748;
+
+  /* ---- Accents ---- */
+  --color-brand-primary: #000000;
+  --color-accent: #5b52bf;
+  --color-link: #5b52bf;
+  --color-link-hover: #463e9e;
+  --color-focus-ring: #5b52bf;
+  --color-success: #1f9d67;
+  --color-success-bg: #e8f6ee;
+  --color-warning: #b5790a;
+  --color-danger: #a82615;
+  --color-danger-bg: #fdecea;
+
+  /* ---- Radius. Buttons, badges, nav and tags are always pill ---- */
+  --radius-sm: 12px;
+  --radius-md: 24px;
+  --radius-lg: 32px;
+  --radius-xl: 40px;
+  --radius-2xl: 48px;
+
+  /* ---- Shadows ---- */
+  --shadow-xs: 0 1px 2px rgba(60, 20, 35, 0.05);
+  --shadow-sm: 0 2px 8px rgba(60, 20, 35, 0.06);
+  --shadow-md: 0 8px 24px rgba(70, 20, 30, 0.08);
+  --shadow-lg: 0 16px 48px rgba(70, 20, 30, 0.12);
+  --shadow-glow-brand: 0 12px 40px rgba(233, 79, 176, 0.18);
+
+  /* ---- Motion. No spring, bounce or elastic easing anywhere ---- */
+  --ease-standard: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ---- Container ---- */
+  --container-page: 1200px;
+  --container-narrow: 760px;
+}
+
+@theme inline {
+  --font-sans: var(--font-jakarta);
+}
+
+:root {
+  --section-spacing-desktop: 120px;
+  --section-spacing-mobile: 64px;
+
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 360ms;
+  --duration-calm: 600ms;
+
+  /* ---- Glassmorphism ---- */
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-bg-dark: rgba(21, 15, 46, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+  --glass-blur: 20px;
+
+  /*
+    Brand gradients — used once per view, on hero/CTA surfaces only.
+
+    --gradient-brand is the specified pink-500 → orange-500. White text on it
+    measures 2.59–3.38:1, so it is DECORATIVE ONLY: blobs and washes, never a
+    label or an icon.
+
+    A11Y: --gradient-cta is the same ramp pushed darker until white text clears
+    AA along its whole length (5.11:1 at its lightest), keeping the pink→orange
+    reading of the original.
+  */
+  --gradient-brand: linear-gradient(135deg, #e94fb0 0%, #ff7a45 100%);
+  --gradient-brand-soft: linear-gradient(135deg, #fef2fa 0%, #fff3ec 100%);
+  --gradient-brand-dark: linear-gradient(
+    160deg,
+    #1c0d20 0%,
+    #3a1030 55%,
+    #4a1f0f 100%
+  );
+  --gradient-cta: linear-gradient(135deg, #bd2f84 0%, #c0451e 100%);
+  --gradient-cta-hover: linear-gradient(135deg, #a82675 0%, #a93a19 100%);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans), -apple-system, "Segoe UI", sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Clear the floating navbar when jumping to an anchor */
+  [id] {
+    scroll-margin-top: 7rem;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 3px;
+    border-radius: 0.35rem;
+  }
+
+  /* German compounds are long — never let a headline force a sideways scroll */
+  h1,
+  h2,
+  h3 {
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  h1 {
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    font-weight: 800;
+  }
+
+  h2 {
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    font-weight: 700;
+  }
+
+  h3 {
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+    font-weight: 700;
+  }
+}
+
+/* ---- Glass surfaces: navbar, cards, ghost buttons ---- */
+/*
+  Order matters: the -webkit- prefix must come FIRST and the standard property
+  LAST. With the standard property first, the CSS minifier treats it as a
+  redundant duplicate and drops it, leaving only -webkit-backdrop-filter — which
+  Chrome does not support, so the blur silently disappears everywhere.
+*/
+@utility glass {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+@utility glass-dark {
+  background: var(--glass-bg-dark);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Decorative only — white content on this fails contrast. */
+@utility bg-gradient-brand {
+  background-image: var(--gradient-brand);
+}
+
+@utility bg-gradient-brand-soft {
+  background-image: var(--gradient-brand-soft);
+}
+
+@utility bg-gradient-brand-dark {
+  background-image: var(--gradient-brand-dark);
+}
+
+/* Carries white labels and icons at AA. */
+@utility bg-gradient-cta {
+  background-image: var(--gradient-cta);
+}
+
+/* Section rhythm: 64px mobile, 120px from tablet up. */
+@utility section-y {
+  padding-top: var(--section-spacing-mobile);
+  padding-bottom: var(--section-spacing-mobile);
+  @media (width >= 48rem) {
+    padding-top: var(--section-spacing-desktop);
+    padding-bottom: var(--section-spacing-desktop);
+  }
+}
+
+/* Section reveal: fade plus a short upward drift, 600ms, calm easing. */
+@utility reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity var(--duration-calm) var(--ease-out),
+    transform var(--duration-calm) var(--ease-out);
+  will-change: opacity, transform;
+}
+
+@layer utilities {
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Background blobs drift slowly: ~30px translate, ~1.08 scale. */
+  .animate-drift {
+    animation: evi-drift 16s var(--ease-standard) infinite alternate;
+  }
+
+  .animate-drift-slow {
+    animation: evi-drift-alt 14s var(--ease-standard) infinite alternate;
+  }
+
+  .animate-float {
+    animation: evi-float 18s var(--ease-standard) infinite alternate;
+  }
+
+  @keyframes evi-drift {
+    from {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+      transform: translate3d(30px, -24px, 0) scale(1.08);
+    }
+  }
+
+  @keyframes evi-drift-alt {
+    from {
+      transform: translate3d(0, 0, 0) scale(1.06);
+    }
+    to {
+      transform: translate3d(-26px, 22px, 0) scale(1);
+    }
+  }
+
+  @keyframes evi-float {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-14px);
+    }
+  }
+}
+
+/* Motion is decoration, never information. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
