@@ -42,8 +42,9 @@ Siehe `.env.example`. Kurz:
 
 ### Wie die Site-URL bestimmt wird
 
-Es ist **keine Domain fest im Code hinterlegt**. `src/lib/constants.ts` löst der
-Reihe nach auf:
+Zieladresse: **https://evi-de.vercel.app** — erreicht, indem das Vercel-Projekt
+`evi-de` heißt. Es ist **keine Domain fest im Code hinterlegt**;
+`src/lib/constants.ts` löst der Reihe nach auf:
 
 1. `NEXT_PUBLIC_SITE_URL` — sobald eine eigene Domain existiert, hier eintragen
 2. `VERCEL_PROJECT_PRODUCTION_URL` — setzt Vercel bei echten Projekten selbst
