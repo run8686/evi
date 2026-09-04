@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny-ps" viewBox="0 0 1024 1024">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2" baseProfile="tiny-ps" width="1024" height="1024" viewBox="0 0 1024 1024">
 <title>Evi</title>
+<desc>Das Evi-Maskottchen: eine rosa-orange Eule mit violettem Herz.</desc>
 <defs>
 <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="512" y1="202.8" x2="512" y2="820.5"><stop offset="0" stop-color="#FDA9F9"/><stop offset="0.1" stop-color="#FAB4DD"/><stop offset="0.2" stop-color="#F9BAC9"/><stop offset="0.3" stop-color="#FAB2B4"/><stop offset="0.4" stop-color="#FBAB9F"/><stop offset="0.5" stop-color="#FCA48B"/><stop offset="0.6" stop-color="#FD9D76"/><stop offset="0.7" stop-color="#FE9661"/><stop offset="0.8" stop-color="#FF8E4C"/><stop offset="0.9" stop-color="#FF7C56"/><stop offset="1" stop-color="#FF6769"/></linearGradient>
 </defs>

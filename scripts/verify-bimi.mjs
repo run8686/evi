@@ -62,6 +62,14 @@ if (svg !== null) {
     "<title> als erstes Kindelement, nicht leer",
     /<svg[^>]*>\s*<title>[^<\s][^<]*<\/title>/.test(svg),
   );
+  record(
+    "absolute Breite und Höhe (mindestens 96 px)",
+    /<svg[^>]*\bwidth="(?:9[6-9]|[1-9]\d{2,})"[^>]*\bheight="(?:9[6-9]|[1-9]\d{2,})"/.test(svg),
+  );
+  record(
+    "<desc> vorhanden und nicht leer",
+    /<desc>[^<\s][^<]*<\/desc>/.test(svg),
+  );
 
   const box = svg.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/);
   record(
