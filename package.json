@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "lint:fix": "eslint --fix"
+    "lint:fix": "eslint --fix",
+    "verify:waitlist": "node --env-file-if-exists=.env.local scripts/verify-waitlist.mjs",
+    "verify:bimi": "node scripts/verify-bimi.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",

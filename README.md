@@ -22,6 +22,7 @@ npm run dev                  # http://localhost:3000
 | `npm start`         | Produktions-Server             |
 | `npm run lint`      | ESLint                         |
 | `npm run typecheck` | TypeScript ohne Emit           |
+| `npm run verify:waitlist` | Preflight: würde eine echte Anmeldung gespeichert? |
 
 > `npm run typecheck` braucht einmalig einen `npm run build`, weil Next.js die
 > Routen-Typen (`LayoutProps`, `PageProps`) generiert.
@@ -35,10 +36,18 @@ Siehe `.env.example`. Kurz:
 | Variable                  | Pflicht | Zweck                                          |
 | ------------------------- | ------- | ---------------------------------------------- |
 | `SUPABASE_URL`            | ja      | Supabase-Projekt-URL (nur serverseitig)        |
-| `SUPABASE_ANON_KEY`       | ja      | Anon-Key, per RLS auf INSERT beschränkt        |
+| `SUPABASE_ANON_KEY`       | ja      | Anon-Key; ab Migration 0003 nur noch RPC-Aufrufe |
+| `RESEND_API_KEY`          | ja¹     | Versand der Bestätigungsmail                   |
+| `WAITLIST_MAIL_FROM`      | ja¹     | Absender, z. B. `Evi <hallo@mail.example.de>`  |
+| `WAITLIST_TOKEN_SECRET`   | ja¹     | Leitet Abmelde-Tokens ab (`openssl rand -base64 32`) |
+| `CRON_SECRET`             | ja      | Schützt `/api/keep-alive`; ohne den Wert antwortet die Route 503 |
 | `NEXT_PUBLIC_POSTHOG_KEY` | nein    | Ohne Key wird keine Statistik geladen          |
 | `NEXT_PUBLIC_POSTHOG_HOST`| nein    | Standard: `https://eu.i.posthog.com`           |
 | `NEXT_PUBLIC_SITE_URL`    | s. u.   | Basis-URL für Canonical, Open Graph, Sitemap   |
+
+¹ Ab Migration 0003 Pflicht. Eine Anmeldung, die nicht bestätigt werden kann,
+ist keine Anmeldung — fehlt der Mailversand, lehnt das Formular die Anmeldung
+mit einer echten Fehlermeldung ab.
 
 ### Wie die Site-URL bestimmt wird
 
@@ -70,21 +79,207 @@ Fehlermeldung ab. Es gibt keinen Demo-Fallback und keinen vorgetäuschten Erfolg
 
 ## Datenbank einrichten
 
-`supabase/migrations/0001_create_waitlist_signups.sql` im Supabase-SQL-Editor
-ausführen (oder via Supabase CLI). Die Migration legt an:
+Die Dateien in `supabase/migrations/` **in Reihenfolge** im Supabase-SQL-Editor
+ausführen (oder via Supabase CLI):
 
-- Tabelle `waitlist_signups`
-- Unique-Index auf `lower(email)` — doppelte Anmeldung ist kein Fehler
-- RLS aktiv, **nur** eine INSERT-Policy für `anon`
+| Migration | Legt an |
+| --------- | ------- |
+| `0001_create_waitlist_signups.sql` | Tabelle `waitlist_signups`, Unique-Index auf `lower(email)`, RLS mit **nur** einer INSERT-Policy für `anon` |
+| `0002_waitlist_status.sql` | `status`, `confirmed_at`, `invited_at`, Index für den Einladungs-Workflow, Auto-Stempel für `invited_at`, verschärfte INSERT-Policy |
+| `0003_waitlist_double_opt_in.sql` | Double-Opt-In: Token-Spalten, die drei RPC-Funktionen, Default `unconfirmed` — und **entzieht `anon` jeden direkten Tabellenzugriff** |
+| `0004_waitlist_unsubscribe_and_retention.sql` | Abmelde-Funktion, Aufräumfunktion für unbestätigte Zeilen, `pg_cron`-Job (falls verfügbar) |
+| `0005_waitlist_confirmation_receipt.sql` | Versendet nach erfolgreicher Bestätigung einmalig die transaktionale Mail „Du bist auf der Liste.“ und protokolliert ihre Annahme durch Resend |
+| `0006_waitlist_confirmation_reminder.sql` | Plant nach der Anmeldung einmalig eine Erinnerung nach 24 Stunden und storniert sie bei rechtzeitiger Bestätigung |
+
+Beide sind idempotent (`if not exists` / `drop … if exists`) und wurden lokal
+gegen PostgreSQL 18 verifiziert, auch der Upgrade-Pfad auf eine bereits
+befüllte Tabelle.
 
 Es gibt absichtlich **keine** SELECT-Policy: Selbst mit dem öffentlichen Key
 lässt sich die Warteliste nicht auslesen. Zum Lesen das Supabase-Dashboard
 verwenden.
 
+### Verkabelung prüfen
+
+```bash
+npx vercel env pull .env.local   # prüft die deployte Konfiguration statt einer lokalen
+npm run verify:waitlist
+```
+
+Das Skript beantwortet die eine Frage, die vor dem Bewerben der Seite zählt:
+**würde eine echte Anmeldung gespeichert?** Es prüft Erreichbarkeit, beide
+Migrationen und dass sich die Liste mit dem öffentlichen Key nicht auslesen
+lässt.
+
+Es **schreibt nichts**. Beide Sonden verletzen absichtlich eine Regel, die die
+Datenbank erzwingt — die Zeile entsteht also nie, interessant ist nur, *welche*
+Regel gegriffen hat. Eine Sonde, die durchgeht, bedeutet, dass die Datenbank
+nicht durchsetzt, was sie soll, und wird als Fehler gemeldet.
+
 Gespeichert werden ausschließlich: E-Mail, optionaler Vorname, Zeitstempel,
-Locale, UTM-Parameter, Referrer und der optionale Marketing-Consent.
-**Keine Gesundheitsdaten** — das Formular fragt nichts dazu, und die Tabelle
-hat keine Spalte dafür. Das soll so bleiben.
+Locale, UTM-Parameter, Referrer, der optionale Marketing-Consent und der
+Bearbeitungsstatus. **Keine Gesundheitsdaten** — das Formular fragt nichts dazu,
+und die Tabelle hat keine Spalte dafür. Auch keine Freitext-Spalte, in die so
+etwas versehentlich geraten könnte. Das soll so bleiben.
+
+---
+
+## Double-Opt-In
+
+Ab Migration 0003 ist eine abgeschickte Anmeldung noch keine Anmeldung. Ablauf:
+
+1. Formular abgeschickt → Zeile mit `status = 'unconfirmed'` und einem
+   Bestätigungs-Token, dann Versand der Mail.
+2. Die Mail enthält einen Link auf `/warteliste/bestaetigen?token=…`.
+3. Der Link **zeigt nur einen Button**. Erst dessen Absenden (POST) bestätigt.
+4. Bestätigt → `confirmed_at` gesetzt, `status = 'pending'`, ab jetzt
+   einladbar.
+5. Danach verschickt Resend die Aufnahmebestätigung „Du bist auf der Liste.“.
+   Die Version im Code entspricht der veröffentlichten Resend-Vorlage mit dem
+   Alias `evi-early-access-confirmed`.
+
+Wenn nach 24 Stunden noch keine Bestätigung vorliegt, verschickt Resend genau
+eine Erinnerung mit demselben, insgesamt 7 Tage gültigen Link. Die Erinnerung
+wird bereits bei der ersten Anmeldung zeitversetzt geplant. Sobald die Person
+bestätigt, storniert die Server Action die geplante Resend-Mail. Dafür braucht
+es weder einen zusätzlichen Cron-Job noch einen Service-Role-Key.
+
+**Warum der Link nicht selbst bestätigt:** Outlook Safe Links, Firmen-Gateways
+und Virenscanner rufen jede URL in einer eingehenden Mail ab, bevor der
+Empfänger sie sieht. Ein Confirm-on-GET würde dadurch Anmeldungen bestätigen,
+denen niemand zugestimmt hat — genau das, was Double-Opt-In verhindern soll.
+
+**Warum es zwei Zeitstempel gibt:** `confirmation_sent_at` ist die Ausstellung
+des Tokens (steuert den Ablauf nach 7 Tagen), `confirmation_delivered_at` die
+Annahme durch den Mailanbieter (steuert die 5-Minuten-Sperre gegen erneuten
+Versand). Wären es eine Spalte, würde ein fehlgeschlagener Versand die Sperre
+starten: der Mensch versucht es erneut, bekommt „throttled" und damit den
+Erfolgsbildschirm für eine Mail, die nie rausging.
+
+**Keine Leseberechtigung, kein Service-Role-Key.** Bestätigen braucht Lookup
+und Update, die App hat aber nur den Anon-Key. Beides läuft deshalb über
+`security definer`-Funktionen, die ein einzelnes Statuswort zurückgeben und nie
+eine Zeile. Nach 0003 hat `anon` **keinen** direkten Tabellenzugriff mehr —
+weder lesend noch schreibend.
+
+---
+
+## Logo im Posteingang
+
+Damit Gmail neben dem Absender das Maskottchen zeigt statt eines grauen Kreises,
+braucht es **BIMI** — zwei DNS-Einträge, eine DMARC-Policy auf `quarantine` oder
+`reject` und ein SVG im Profil *Tiny Portable/Secure*.
+
+```bash
+npm run verify:bimi
+```
+
+Prüft die Logodatei gegen die Formatregeln, die DMARC-Kette, SPF/DKIM und den
+BIMI-Eintrag. Stand heute meldet es zwei offene Punkte: `_dmarc` wird noch von
+IONOS verwaltet und steht auf `p=none`.
+
+Der volle Ablauf inklusive der Kostenfrage — Gmail zeigt BIMI **nur mit
+kostenpflichtigem VMC/CMC-Zertifikat** — steht in
+`docs/runbook-logo-in-mailclients.md`.
+
+
+## Keep-Alive-Cron
+
+Free-Projekte bei Supabase pausieren nach etwa einer Woche ohne Anfragen. Die
+Landingpage liegt auf Vercel und läuft davon unabhängig weiter — die Datenbank
+sieht also nur dann Verkehr, wenn sich jemand anmeldet. Genau die ruhige Phase
+nach dem Start ist damit die, in der das Projekt pausiert, und die erste echte
+Anmeldung danach ist die, die fehlschlägt.
+
+`vercel.json` plant deshalb täglich um 06:00 UTC einen Aufruf von
+`/api/keep-alive`. Die Route stellt eine Anfrage an die Datenbank, die durch RLS
+abgewiesen wird und leer zurückkommt — sie **liest und schreibt nichts**, das
+reicht aber als Aktivität.
+
+Sie ist zugleich Monitoring: Eine Antwort außerhalb von 2xx erscheint im
+Vercel-Cron-Log. Das ist der Unterschied zwischen „Anmeldepfad ist kaputt, ich
+weiß es" und „seit zwei Wochen hat sich niemand angemeldet, warum eigentlich".
+
+`CRON_SECRET` ist **Pflicht**. Vercel hängt den Wert als
+`Authorization: Bearer …` an geplante Aufrufe. Fehlt die Variable, antwortet die
+Route mit 503 und verweigert den Dienst, statt einen offenen Endpunkt
+auszuliefern, den jeder gedrückt halten kann.
+
+> Der Hobby-Plan von Vercel erlaubt tägliche Cron-Ausführungen. Für eine
+> Wochengrenze ist täglich reichlich Puffer.
+
+---
+
+## Abmelden und Aufbewahrung
+
+**Abmelden.** Jede Mail enthält einen Abmeldelink auf `/warteliste/abmelden`.
+Der Link zeigt — wie die Bestätigung — nur einen Button; erst der POST löscht.
+Gelöscht wird die **ganze Zeile**: Es gibt nichts zu behalten, und eine
+Restliste von Menschen, die vergessen werden wollten, wäre ihr eigenes
+Datenschutzproblem.
+
+Der Abmelde-Token ist **nicht zufällig**, sondern aus `WAITLIST_TOKEN_SECRET`
+und der Adresse abgeleitet. Sonst müsste er bei jedem erneuten Versand neu
+erzeugt werden und der Link in jeder früheren Mail würde still kaputtgehen —
+ein Abmeldelink, der jemandem „du stehst nicht auf der Liste" antwortet,
+obwohl er darauf steht, ist schlimmer als keiner. **Ein Wechsel des Secrets
+entwertet jeden je verschickten Abmeldelink.**
+
+Der `List-Unsubscribe`-Header wird als URL gesetzt, bewusst **ohne**
+`List-Unsubscribe-Post`: One-Click-Abmeldung nach RFC 8058 braucht einen
+POST-Endpunkt, und einen anzukündigen, den es nicht gibt, wäre schlechter als
+ihn nicht anzubieten. Vor dem ersten echten Newsletter-Versand muss er ergänzt
+werden.
+
+**Aufbewahrung.** `waitlist_delete_stale_unconfirmed()` löscht Zeilen mit
+`status = 'unconfirmed'`, die älter als 30 Tage sind. Zeilen aus der Zeit vor
+Double-Opt-In tragen `status = 'pending'` und bleiben davon unberührt.
+
+Migration 0004 plant den Job über `pg_cron` (täglich 03:17 UTC), **sofern die
+Extension aktiviert ist**. Ist sie es nicht, gibt die Migration einen Hinweis
+aus und läuft trotzdem durch — dann passiert aber auch kein automatisches
+Löschen. Aktivieren unter *Database → Extensions → pg_cron*, danach Migration
+0004 erneut ausführen.
+
+---
+
+## Einladungen freischalten
+
+Es gibt bewusst **kein eigenes Admin-Dashboard**. Der Supabase-Table-Editor ist
+die Verwaltungsoberfläche — Begründung in
+`docs/waitlist-go-live-plan.md`.
+
+Statuswerte von `waitlist_signups.status`:
+
+| Wert | Bedeutung |
+| --- | --- |
+| `unconfirmed` | Double-Opt-In-Mail verschickt, noch nicht bestätigt (ab Migration 0003) |
+| `pending` | Auf der Liste, wartet auf eine Einladung |
+| `invited` | Einladung verschickt |
+| `joined` | Einladung angenommen und registriert |
+| `declined` | Möchte nicht eingeladen werden |
+
+**Workflow für eine Einladungswelle:**
+
+1. Im Supabase-Table-Editor `waitlist_signups` öffnen.
+2. Nach `status = 'pending'` filtern, nach `created_at` aufsteigend sortieren.
+3. Die ältesten N Personen einladen (der Versand passiert nicht hier — die
+   eigentlichen Alpha-Einladungen gehören nach evi-v2).
+4. Bei diesen Zeilen `status` auf `invited` setzen. **`invited_at` nicht von
+   Hand füllen** — ein Trigger stempelt den Zeitpunkt automatisch, sobald der
+   Status auf `invited` wechselt. Ein von Hand gesetztes falsches Datum wäre
+   schlimmer als keines, weil es entscheidet, wer schon kontaktiert wurde.
+5. Wer sich registriert hat, wird auf `joined` gesetzt.
+
+Der Anon-Key kann diese Felder nicht setzen: Die INSERT-Policy aus Migration
+0002 akzeptiert nur Zeilen mit `status = 'pending'` und leeren
+`confirmed_at`/`invited_at`. Diese Zustände setzt ausschließlich ein Mensch im
+Dashboard.
+
+Für eine Tabelle außerhalb von Supabase: **CSV-Export** im Table-Editor. Es gibt
+bewusst keine Google-Sheets-Anbindung (das wäre ein zweiter
+Auftragsverarbeiter für personenbezogene Daten und ein zweiter Ort, an dem die
+Liste liegt).
 
 ---
 
@@ -125,11 +320,25 @@ Besucher:innen ruft Google nie auf, was bei einer Mental-Health-Seite zählt.
 
 ### Markenassets
 
+Verbindlich ist `public/assets/logo-mascot.png`. Alle anderen Maskottchen-Dateien
+sind Ableitungen davon und tragen **dieselben** Farben:
+
+| | Verlauf oben → unten | Herz | Augenring |
+| --- | --- | --- | --- |
+| Maskottchen | `#FDA9F9` → `#FF6769` | `#9491DF` | `#FAFFDF` |
+
 - `public/assets/logo-mascot.png` — Maskottchen, **unveränderte** Originalfarben
-  (Verlauf gelb `#FFD105` → rosé `#FF5366`, periwinkle Herz `#466EFA`)
+- `public/assets/logo-mascot-og.png` — Zuschnitt für das Open-Graph-Bild
+- `public/assets/evi-logo-email.png` — Lockup für den Mailkopf
+- `public/assets/evi-bimi.svg` — Absenderlogo für den Posteingang, siehe oben.
+  Aus dem Maskottchen vektorisiert, Kontur mit 0,19 % Abweichung
+- `src/app/icon.png`, `src/app/apple-icon.png` — Favicon / Touch-Icon
 - `public/assets/wordmark-black.png` / `wordmark-white.png` — identische
   Buchstabenformen, nur die Füllung unterscheidet sich
-- `src/app/icon.png`, `src/app/apple-icon.png` — Favicon / Touch-Icon
+
+> Wer das Maskottchen austauscht, muss **alle sechs** Dateien mitziehen —
+> `npm run verify:bimi` prüft nur das Format des SVG, nicht seine Ähnlichkeit
+> zum PNG.
 
 Regel im Code (`src/components/brand/logo.tsx`): Das Maskottchen wird nie
 umgefärbt, entsättigt, invertiert oder verzerrt — ein Drop-Shadow ist der

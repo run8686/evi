@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...except the template. It holds only variable names and comments, never a
+# value, and the README points at it — a clone without it cannot be set up.
+!.env.example
 
 # vercel
 .vercel
