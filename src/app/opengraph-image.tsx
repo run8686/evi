@@ -111,7 +111,7 @@ export default async function Image() {
             </div>
           </div>
 
-          <img src={mascotSrc} alt="" width={310} height={293} />
+          <img src={mascotSrc} alt="" width={310} height={260} />
         </div>
       </div>
     ),

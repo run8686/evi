@@ -12,7 +12,7 @@
   /* ---- Pink — mascot crown, primary brand pink ---- */
   --color-pink-50: #fef2fa;
   --color-pink-100: #fce0f4;
-  --color-pink-200: #f9bce8;
+  --color-pink-200: #fbaeea;
   --color-pink-300: #f68fd6;
   --color-pink-400: #f169c4;
   --color-pink-500: #e94fb0;
@@ -26,7 +26,7 @@
   --color-orange-100: #ffe1cd;
   --color-orange-200: #ffc199;
   --color-orange-300: #ff9f68;
-  --color-orange-400: #ff8a52;
+  --color-orange-400: #fe945c;
   --color-orange-500: #ff7a45;
   --color-orange-600: #e85a2c;
   --color-orange-700: #bb3f1d;
@@ -38,14 +38,21 @@
   --color-periwinkle-100: #e1defa;
   --color-periwinkle-200: #c5c0f2;
   --color-periwinkle-300: #a29ce9;
-  --color-periwinkle-400: #8b86e0;
+  --color-periwinkle-400: #9491df;
   --color-periwinkle-500: #7269d3;
   --color-periwinkle-600: #5b52bf;
   --color-periwinkle-700: #463e9e;
   --color-periwinkle-800: #332c73;
   --color-periwinkle-900: #211c4a;
 
-  /* ---- Cream — mascot eye-ring, warm neutral surfaces ---- */
+  /* ---- Coral — the mascot's lower body. Decorative only: it is not
+       --color-danger, and it never carries text. ---- */
+  --color-coral-500: #ff6e63;
+
+  /* ---- Halo — the mascot's eye-ring, measured. Use sparingly. ---- */
+  --color-halo-100: #faffdf;
+
+  /* ---- Cream — warm neutral surfaces (no longer read as the eye-ring) ---- */
   --color-cream-50: #fefcf9;
   --color-cream-100: #fdf6ec;
   --color-cream-200: #fbecd7;
@@ -161,6 +168,16 @@
     AA along its whole length (5.11:1 at its lightest), keeping the pink→orange
     reading of the original.
   */
+  /* Reproduces the mascot's own vertical ramp, measured from the artwork.
+     Decorative — never behind text. */
+  --gradient-mascot: linear-gradient(
+    180deg,
+    #fbaeea 0%,
+    #fab7c1 24%,
+    #fca58e 48%,
+    #fe945c 72%,
+    #ff6e63 100%
+  );
   --gradient-brand: linear-gradient(135deg, #e94fb0 0%, #ff7a45 100%);
   --gradient-brand-soft: linear-gradient(135deg, #fef2fa 0%, #fff3ec 100%);
   --gradient-brand-dark: linear-gradient(

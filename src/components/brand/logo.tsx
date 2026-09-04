@@ -12,8 +12,8 @@ import Image from "next/image";
 
 const MASCOT = {
   src: "/assets/logo-mascot.png",
-  width: 877,
-  height: 830,
+  width: 994,
+  height: 834,
 } as const;
 
 const WORDMARK = {
