@@ -1,63 +1,66 @@
-import { Container } from "@/components/ui/container";
-import { Reveal } from "@/components/ui/reveal";
-import { ViewTracker } from "@/components/ui/view-tracker";
 import { WaitlistForm } from "@/components/waitlist/waitlist-form";
+import { ViewTracker } from "@/components/ui/view-tracker";
 import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
 
-const ASSURANCES = [
-  "Wir laden nach und nach kleine Gruppen ein.",
-  "Du bekommst Bescheid, sobald ein Platz für dich frei ist.",
-  "Keine Kosten, kein Abo, keine Verpflichtung.",
-];
+const EXPECTATIONS = [
+  "evi ist mitten in der Entwicklung — deine Anmeldung wird nicht sofort freigeschaltet.",
+  "Der Zugang erfolgt schrittweise in kleinen Testwellen.",
+  "Für Endnutzer bleibt evi dauerhaft kostenlos.",
+  "Du kannst dich jederzeit mit einer kurzen Nachricht wieder austragen.",
+] as const;
 
+/**
+ * The signup, and the last section before the FAQ.
+ *
+ * The form itself is unchanged: it keeps the Server Action, the honeypot, the
+ * attribution fields and the double-opt-in flow — only the surface around it
+ * is new. What is promised here has to match what the rest of the page said,
+ * so the four expectations are listed under the form rather than in a modal.
+ */
 export function EarlyAccess() {
   return (
-    <section id="early-access" className="section-y relative overflow-hidden">
+    <section
+      id="early-access"
+      className="section-y relative overflow-hidden px-5 sm:px-8"
+      aria-labelledby="early-access-titel"
+    >
       <ViewTracker event={ANALYTICS_EVENTS.earlyAccessSectionView} />
 
-      {/* One drifting brand blob behind the panel, per Design.md. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10"
-      >
-        <div className="absolute top-1/4 left-1/2 size-[34rem] -translate-x-1/2 rounded-full bg-gradient-brand opacity-[0.16] blur-[80px] motion-safe:animate-drift" />
-      </div>
+        className="pointer-events-none absolute -top-[100px] left-1/2 h-[340px] w-[600px] -translate-x-1/2 rounded-full opacity-12 blur-[90px] [background-image:var(--gradient-brand)] motion-safe:animate-blob"
+      />
 
-      <Container>
-        <div className="grid items-center gap-12 lg:grid-cols-[1fr_1fr] lg:gap-16">
-          <Reveal>
-            <p className="text-[0.75rem] font-bold tracking-[0.1em] text-orange-700 uppercase">
-              Early Access
-            </p>
-            <h2 className="mt-4 text-[clamp(1.875rem,4vw,3rem)] text-balance text-text-primary">
-              Evi entsteht gerade. Du kannst früh dabei sein.
-            </h2>
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-text-secondary">
-              Wir öffnen Evi Schritt für Schritt für erste Tester:innen. Trag
-              dich in die Warteliste ein und wir melden uns, sobald ein Platz
-              für dich verfügbar ist.
-            </p>
+      <div className="relative mx-auto flex max-w-[620px] flex-col items-center gap-5 text-center">
+        <h2
+          id="early-access-titel"
+          className="text-[clamp(1.9rem,5.2vw,3.4rem)] leading-[1.08] font-extrabold tracking-[-0.045em] text-pretty"
+        >
+          Sei unter den Ersten, die mit evi reden.
+        </h2>
+        <p className="text-lg leading-relaxed text-text-secondary text-pretty">
+          Der Zugang öffnet in kleinen Wellen — eine E-Mail genügt, um dabei zu
+          sein.
+        </p>
 
-            {/* No bullet markers — separated by hairlines instead. */}
-            <ul className="mt-8 border-t border-border">
-              {ASSURANCES.map((item) => (
-                <li
-                  key={item}
-                  className="border-b border-border py-3 text-text-tertiary"
-                >
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-
-          <Reveal delay={120}>
-            <div className="glass rounded-[32px] p-6 sm:p-8">
-              <WaitlistForm />
-            </div>
-          </Reveal>
+        <div className="glass mt-1.5 w-full rounded-[32px] p-6 sm:p-8">
+          <WaitlistForm />
         </div>
-      </Container>
+
+        <ul className="flex w-full max-w-[520px] flex-col gap-2.5 text-left">
+          {EXPECTATIONS.map((item) => (
+            <li
+              key={item}
+              className="flex gap-2.5 text-sm leading-relaxed text-text-secondary"
+            >
+              <span aria-hidden="true" className="font-extrabold text-periwinkle-700">
+                –
+              </span>
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }

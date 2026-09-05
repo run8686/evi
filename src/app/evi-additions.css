@@ -1,0 +1,76 @@
+/*
+  Additions for the new landing page design.
+
+  Import this from globals.css, directly under `@import "tailwindcss";`:
+
+      @import "tailwindcss";
+      @import "./evi-additions.css";
+
+  Nothing here overrides an existing token — it only adds the motion and
+  surface primitives the new sections need. The A11Y notes in globals.css
+  still hold: --gradient-brand stays decorative, text sits on --gradient-cta.
+*/
+
+@layer utilities {
+  /* Slow ambient drift for the blurred brand blobs behind hero/CTA sections. */
+  .animate-blob {
+    animation: evi-blob 18s var(--ease-standard) infinite alternate;
+  }
+
+  .animate-blob-reverse {
+    animation: evi-blob 20s var(--ease-standard) infinite alternate-reverse;
+  }
+
+  /* The mascot and the floating thought bubbles. Short, never bouncy. */
+  .animate-float-soft {
+    animation: evi-float-soft 4.6s ease-in-out infinite alternate;
+  }
+
+  /* The live dot on the status line. Opacity + scale, no colour change. */
+  .animate-breathe {
+    animation: evi-breathe 2.4s ease-in-out infinite alternate;
+  }
+
+  /* Hero photos: a barely perceptible push-in so a still image stays alive. */
+  .animate-ken {
+    animation: evi-ken 24s ease-in-out infinite alternate;
+  }
+
+  @keyframes evi-blob {
+    from {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+      transform: translate3d(-30px, 30px, 0) scale(1.08);
+    }
+  }
+
+  @keyframes evi-float-soft {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-9px);
+    }
+  }
+
+  @keyframes evi-breathe {
+    from {
+      opacity: 0.45;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0.9;
+      transform: scale(1.12);
+    }
+  }
+
+  @keyframes evi-ken {
+    from {
+      transform: scale(1.04) translate3d(0, 0, 0);
+    }
+    to {
+      transform: scale(1.16) translate3d(-1.5%, -1.5%, 0);
+    }
+  }
+}

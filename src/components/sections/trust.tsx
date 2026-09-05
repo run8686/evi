@@ -1,73 +1,101 @@
-import Link from "next/link";
-
 import { Container } from "@/components/ui/container";
 import { Reveal } from "@/components/ui/reveal";
 
-/**
- * Privacy principles.
- *
- * Every line here describes something this page actually does, and can be
- * checked in the code. There are deliberately no certifications, no compliance
- * badges and no encryption promises — those need audits, not copywriting.
- */
-const PRINCIPLES = [
+const LIMITS = [
   {
-    title: "So wenig Daten wie möglich",
-    body: "Für die Warteliste brauchen wir deine E-Mail-Adresse. Dein Vorname ist optional — mehr fragen wir nicht.",
+    title: "evi ist keine Therapie.",
+    body: "Keine Diagnose. Kein Arzt. Kein Krisendienst. evi hilft beim Verstehen und Sortieren — und sagt dir, wenn etwas anderes gerade wichtiger ist.",
   },
   {
-    title: "Keine Gesundheitsdaten",
-    body: "Wir fragen dich hier nichts zu Diagnosen, Symptomen, Medikamenten oder Therapie. Das gehört nicht in eine Warteliste.",
+    title: "Deine Gespräche sind kein Geschäftsmodell.",
+    body: "Persönliche Gesprächs- und Gesundheitsdaten werden nicht verkauft, nicht für Werbeprofile genutzt und nicht zum Training allgemeiner KI-Modelle monetarisiert.",
   },
   {
-    title: "Statistik nur mit Zustimmung",
-    body: "Ohne dein Einverständnis wird nichts gemessen. Und was du ins Formular schreibst, wird nie an die Statistik übertragen.",
+    title: "Fachlich mitentwickelt.",
+    body: "evi entsteht nicht allein am Rechner. Psycholog:innen entwickeln mit und begleiten, wie evi in Gesprächen reagiert — besonders dort, wo es sensibel wird.",
   },
-  {
-    title: "Grenzen gehören ins Produkt",
-    body: "Was Evi nicht kann, sagen wir auf dieser Seite — nicht erst in den Nutzungsbedingungen.",
-  },
-];
+] as const;
 
+/**
+ * The dark section, and the only one on the page.
+ *
+ * It carries the limits rather than the promises, which is why it gets the
+ * strongest surface treatment: what Evi will not do is the most important
+ * thing on a mental-health page, so it is not allowed to look like fine print.
+ *
+ * Text on this ground is full-opacity white or white/78 — never a muted tint
+ * below AA. --gradient-brand-dark is the specified surface.
+ */
 export function Trust() {
   return (
-    <section className="bg-bg-subtle section-y">
-      <Container>
-        <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
-          <Reveal>
-            <p className="text-sm font-bold tracking-[0.14em] text-link uppercase">
-              Vertrauen & Privatsphäre
-            </p>
-            <h2 className="mt-4 text-[2.1rem] leading-[1.1] font-extrabold tracking-[-0.025em] text-balance text-text-primary sm:text-5xl">
-              Vertrauen entsteht durch Entscheidungen, nicht durch Versprechen.
-            </h2>
-            <p className="mt-6 max-w-md text-lg leading-relaxed text-text-tertiary">
-              Evi entsteht in einem sensiblen Bereich. Deshalb sagen wir lieber,
-              was wir konkret tun, als mit Siegeln zu werben.
-            </p>
-            <Link
-              href="/datenschutz"
-              className="mt-6 inline-flex min-h-11 items-center gap-2 font-semibold text-link underline-offset-4 hover:underline"
-            >
-              Zur Datenschutzerklärung
-              <span aria-hidden="true">→</span>
-            </Link>
-          </Reveal>
+    <section
+      id="vertrauen"
+      className="section-y px-5 text-white [background-image:var(--gradient-brand-dark)] sm:px-8"
+      aria-labelledby="vertrauen-titel"
+    >
+      <Container className="!px-0">
+        <div className="flex flex-col gap-10 sm:gap-16">
+          <div className="flex max-w-[740px] flex-col gap-4">
+            <Reveal>
+              <h2
+                id="vertrauen-titel"
+                className="text-[clamp(1.9rem,5.2vw,3.4rem)] leading-[1.08] font-extrabold tracking-[-0.045em] text-white text-pretty"
+              >
+                Keine Siegel. Nur klare Grenzen.
+              </h2>
+            </Reveal>
+            <Reveal delay={130}>
+              <p className="text-lg leading-relaxed text-white/78 text-pretty">
+                Du solltest wissen, worauf du dich einlässt. Deshalb stehen hier
+                konkrete Zusagen — und Ehrlichkeit darüber, wo wir stehen.
+              </p>
+            </Reveal>
+          </div>
 
-          <ul className="grid gap-4 sm:grid-cols-2">
-            {PRINCIPLES.map((principle, index) => (
-              <Reveal as="li" key={principle.title} delay={index * 80}>
-                <div className="h-full glass rounded-[32px] p-6 sm:p-7">
-                  <h3 className="text-lg font-bold tracking-tight text-text-primary">
-                    {principle.title}
-                  </h3>
-                  <p className="mt-2.5 text-[0.97rem] leading-relaxed text-text-tertiary">
-                    {principle.body}
-                  </p>
-                </div>
+          <div className="grid gap-6 sm:grid-cols-3 sm:gap-9">
+            {LIMITS.map((limit, index) => (
+              <Reveal
+                key={limit.title}
+                delay={index * 120}
+                className="flex flex-col gap-3 border-t-2 border-white/28 pt-5"
+              >
+                <h3 className="text-[clamp(1.25rem,2.4vw,1.625rem)] leading-[1.16] font-extrabold tracking-[-0.03em] text-white">
+                  {limit.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-white/78 text-pretty">
+                  {limit.body}
+                </p>
               </Reveal>
             ))}
-          </ul>
+          </div>
+
+          <Reveal delay={220} className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+            <div className="flex flex-col gap-3.5 rounded-[40px] border border-white/16 bg-white/7 p-7 sm:p-8">
+              <span className="text-[0.6875rem] font-extrabold tracking-[0.08em] text-white/60 uppercase">
+                Was evi weiß
+              </span>
+              <p className="text-[clamp(1.0625rem,2vw,1.3125rem)] leading-[1.3] font-bold tracking-[-0.02em] text-white text-pretty">
+                Was du erzählst — damit das Gespräch dir hilft.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3.5 rounded-[40px] border border-white/16 bg-white/7 p-7 sm:p-8">
+              <span className="text-[0.6875rem] font-extrabold tracking-[0.08em] text-white/60 uppercase">
+                Was andere sehen
+              </span>
+              <p className="text-[clamp(1.0625rem,2vw,1.3125rem)] leading-[1.3] font-bold tracking-[-0.02em] text-white text-pretty">
+                Nichts davon. Keine einzelnen Chats, keine persönlichen Inhalte.
+              </p>
+            </div>
+          </Reveal>
+
+          <Reveal delay={300}>
+            <p className="max-w-[680px] text-sm leading-relaxed text-white/70 text-pretty">
+              Wir versprechen hier keine technischen Zusicherungen, die wir noch
+              nicht belegen können. Das Safety-Framework mit klaren
+              Eskalationsstufen entwickeln wir gemeinsam mit Psycholog:innen
+              weiter.
+            </p>
+          </Reveal>
         </div>
       </Container>
     </section>

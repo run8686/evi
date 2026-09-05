@@ -60,21 +60,32 @@ export const SOCIAL = {
  */
 export const SUPPORT_EMAIL = "hello@evi-health.eu";
 
+/** Postal address for the footer and the Impressum. */
+export const COMPANY = {
+  legalName: "evihealth UG",
+  street: "Waldenserstr. 30",
+  city: "10551 Berlin",
+} as const;
+
+/**
+ * Section anchors, in page order. The labels are the section names people see
+ * as they scroll, so the menu reads as a map of the page rather than a set of
+ * feature words.
+ */
 export const NAV_LINKS = [
-  { href: "#was-ist-evi", label: "Was ist Evi?" },
-  { href: "#fuer-dich", label: "Für dich" },
-  { href: "/frag-evi", label: "Frag Evi" },
-  { href: "#sicherheit", label: "Sicherheit" },
-  { href: "#early-access", label: "Early Access" },
+  { href: "#so-funktioniert", label: "So funktioniert evi" },
+  { href: "#warum-evi", label: "Warum evi" },
+  { href: "/frag-evi", label: "Frag evi" },
+  { href: "#vertrauen", label: "Vertrauen" },
+  { href: "#faq", label: "FAQ" },
 ] as const;
 
 /**
  * Verified crisis resources.
  *
- * Intentionally EMPTY. Emergency numbers and crisis services must be supplied
- * and verified by a human before they appear on a mental-health page — a wrong
- * number here is actively dangerous. Until this is filled, /akute-hilfe shows
- * generic, non-specific guidance instead (see src/app/akute-hilfe/page.tsx).
+ * Confirmed for release: the German emergency number and the two round-the-clock
+ * Telefonseelsorge lines. Nothing goes in this list that has not been checked
+ * by a human — a wrong number on this page is actively dangerous.
  */
 export type AcuteHelpResource = {
   name: string;
@@ -87,4 +98,28 @@ export type AcuteHelpResource = {
   availability?: string;
 };
 
-export const ACUTE_HELP_RESOURCES: readonly AcuteHelpResource[] = [];
+export const ACUTE_HELP_RESOURCES: readonly AcuteHelpResource[] = [
+  {
+    name: "Notruf",
+    description:
+      "Bei akuter Lebensgefahr — für dich oder für jemand anderen. Rund um die Uhr erreichbar.",
+    phone: "112",
+    availability: "24/7",
+  },
+  {
+    name: "Telefonseelsorge",
+    description:
+      "Kostenlos, anonym und ohne Anlass. Jemand hört zu, auch mitten in der Nacht.",
+    phone: "0800 111 0 111",
+    availability: "24/7",
+  },
+  {
+    // Distinct name: /akute-hilfe keys its list by name, and two identical
+    // names there would collide.
+    name: "Telefonseelsorge, zweite Leitung",
+    description:
+      "Dieselbe Beratung — wenn die erste Leitung gerade belegt ist.",
+    phone: "0800 111 0 222",
+    availability: "24/7",
+  },
+];
