@@ -63,7 +63,7 @@ export const SUPPORT_EMAIL = "hello@evi-health.eu";
 export const NAV_LINKS = [
   { href: "#was-ist-evi", label: "Was ist Evi?" },
   { href: "#fuer-dich", label: "Für dich" },
-  { href: "#frag-evi", label: "Frag Evi" },
+  { href: "/frag-evi", label: "Frag Evi" },
   { href: "#sicherheit", label: "Sicherheit" },
   { href: "#early-access", label: "Early Access" },
 ] as const;
