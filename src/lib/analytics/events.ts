@@ -20,6 +20,9 @@ export const ANALYTICS_EVENTS = {
   linkedinClick: "linkedin_click",
   /** Any Early-Access CTA outside the hero and navbar; carries `location`. */
   earlyAccessClick: "early_access_click",
+  /** "Frag Evi selbst" widget. Counts only — never the message text itself. */
+  eviChatMessageSent: "evi_chat_message_sent",
+  eviChatFallbackShown: "evi_chat_fallback_shown",
 } as const;
 
 export type AnalyticsEvent =

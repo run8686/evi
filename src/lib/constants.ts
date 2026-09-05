@@ -46,16 +46,24 @@ export const SITE = {
   locale: "de-DE",
 } as const;
 
-/** TODO: replace with the real channel URLs before launch. */
+/** TikTok and LinkedIn are still TODO: replace with the real URLs before launch. */
 export const SOCIAL = {
-  instagram: "https://instagram.com/",
+  instagram: "https://www.instagram.com/evi.mental",
   tiktok: "https://tiktok.com/",
   linkedin: "https://linkedin.com/",
 } as const;
 
+/**
+ * Used as the honest fallback the "Frag Evi selbst" chat offers when a
+ * question falls outside its master document — see
+ * src/lib/evi-chat/system-prompt.server.ts.
+ */
+export const SUPPORT_EMAIL = "hello@evi-health.eu";
+
 export const NAV_LINKS = [
   { href: "#was-ist-evi", label: "Was ist Evi?" },
   { href: "#fuer-dich", label: "Für dich" },
+  { href: "#frag-evi", label: "Frag Evi" },
   { href: "#sicherheit", label: "Sicherheit" },
   { href: "#early-access", label: "Early Access" },
 ] as const;

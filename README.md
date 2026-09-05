@@ -41,6 +41,8 @@ Siehe `.env.example`. Kurz:
 | `WAITLIST_MAIL_FROM`      | ja¹     | Absender, z. B. `Evi <hallo@mail.example.de>`  |
 | `WAITLIST_TOKEN_SECRET`   | ja¹     | Leitet Abmelde-Tokens ab (`openssl rand -base64 32`) |
 | `CRON_SECRET`             | ja      | Schützt `/api/keep-alive`; ohne den Wert antwortet die Route 503 |
+| `ANTHROPIC_API_KEY`       | nein²   | "Frag Evi selbst"-Chat (`/api/evi-chat`)       |
+| `ANTHROPIC_MODEL`         | nein    | Standard: `claude-sonnet-5`                    |
 | `NEXT_PUBLIC_POSTHOG_KEY` | nein    | Ohne Key wird keine Statistik geladen          |
 | `NEXT_PUBLIC_POSTHOG_HOST`| nein    | Standard: `https://eu.i.posthog.com`           |
 | `NEXT_PUBLIC_SITE_URL`    | s. u.   | Basis-URL für Canonical, Open Graph, Sitemap   |
@@ -48,6 +50,10 @@ Siehe `.env.example`. Kurz:
 ¹ Ab Migration 0003 Pflicht. Eine Anmeldung, die nicht bestätigt werden kann,
 ist keine Anmeldung — fehlt der Mailversand, lehnt das Formular die Anmeldung
 mit einer echten Fehlermeldung ab.
+
+² Ohne Key zeigt der Chat nur seinen ehrlichen Fallback-Text (Verweis auf
+Instagram/E-Mail) statt einer echten Antwort — kein Demo-Fallback, keine
+erfundene Antwort.
 
 ### Wie die Site-URL bestimmt wird
 
