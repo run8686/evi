@@ -11,6 +11,7 @@ import { Perspectives } from "@/components/sections/perspectives";
 import { StartingPoints } from "@/components/sections/starting-points";
 import { StatusLine } from "@/components/sections/status-line";
 import { TrustBrief } from "@/components/sections/trust-brief";
+import { Trust } from "@/components/sections/trust";
 import { WhyEvi } from "@/components/sections/why-evi";
 
 /**

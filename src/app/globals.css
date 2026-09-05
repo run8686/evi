@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./evi-additions.css";
 
 /*
   Evi design tokens — implements Design.md.
