@@ -49,9 +49,10 @@ export default function DatenschutzPage() {
           Seite), damit wir wissen, über welchen Kanal du zu uns gefunden hast.
         </p>
         <p>
-          Wir fragen dich <strong>nicht</strong> nach Diagnosen, Symptomen,
-          Medikamenten, Therapieerfahrungen oder deinem Befinden. Solche Daten
-          werden über diese Seite nicht erhoben und nicht gespeichert.
+          Das Wartelistenformular fragt dich <strong>nicht</strong> nach
+          Diagnosen, Symptomen, Medikamenten, Therapieerfahrungen oder deinem
+          Befinden. Solche Daten werden über das Wartelistenformular nicht
+          erhoben und nicht gespeichert.
         </p>
         <p>
           Die Daten nutzen wir, um dich einzuladen, sobald ein
@@ -107,6 +108,29 @@ export default function DatenschutzPage() {
         </p>
       </Prose>
 
+      <Prose heading="Chat „Frag Evi selbst“">
+        <p>
+          Beim Öffnen der Chat-Seite wird noch kein Chat-Inhalt übertragen.
+          Erst wenn du auf <strong>„Senden“</strong> klickst, übertragen wir
+          deine Frage und bis zu sieben vorherige Nachrichten dieses Chats an
+          die <strong>OpenAI API</strong>, damit eine Antwort erzeugt wird.
+        </p>
+        <p>
+          Der Chat ist ausschließlich für Fragen zum Produkt Evi gedacht.
+          Bitte gib dort <strong>keine Namen, Kontaktdaten, Diagnosen, Symptome
+          oder andere Gesundheitsinformationen</strong> ein. Evi speichert den
+          Chat nicht in einer eigenen Datenbank und protokolliert die Inhalte
+          nicht in den Anwendungslogs.
+        </p>
+        <p>
+          Der API-Aufruf wird mit deaktivierter Antwortspeicherung ausgeführt.
+          OpenAI verwendet API-Eingaben und -Ausgaben nach eigenen Angaben
+          nicht zum Modelltraining. Zur Missbrauchserkennung können Inhalte
+          standardmäßig bis zu <strong>30 Tage</strong> gespeichert werden;
+          gesetzliche oder sicherheitsbedingte Ausnahmen sind möglich.
+        </p>
+      </Prose>
+
       <Prose heading="Statistik">
         <p>
           Wir möchten verstehen, wie viele Menschen die Seite erreichen, woher
@@ -148,8 +172,8 @@ export default function DatenschutzPage() {
       <PendingNotice>
         Noch zu ergänzen: verantwortliche Stelle, Rechtsgrundlagen, die
         Rechtsgrundlage für die Übermittlung in die USA samt
-        Auftragsverarbeitungsvertrag mit Resend, Hosting-Standort der Datenbank
-        sowie die vollständige Belehrung über deine Rechte.
+        Auftragsverarbeitungsverträgen mit Resend und OpenAI, Hosting-Standort
+        der Datenbank sowie die vollständige Belehrung über deine Rechte.
       </PendingNotice>
     </PageShell>
   );

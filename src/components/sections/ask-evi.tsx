@@ -150,8 +150,24 @@ export function AskEvi() {
               ) : null}
             </div>
 
+            <p
+              id={`${inputId}-privacy`}
+              className="mt-4 border-t border-white/50 pt-4 text-[0.8125rem] leading-relaxed text-text-secondary"
+            >
+              Bitte keine Namen, Kontaktdaten oder Gesundheitsangaben eingeben.
+              Mit dem Senden wird der Chat zur Antwortgenerierung an OpenAI
+              übertragen.{" "}
+              <Link
+                href="/datenschutz"
+                className="font-medium text-link underline underline-offset-2"
+              >
+                Datenschutz
+              </Link>
+              .
+            </p>
+
             <form
-              className="mt-4 flex items-end gap-2 border-t border-white/50 pt-4"
+              className="mt-3 flex items-end gap-2"
               onSubmit={(event) => {
                 event.preventDefault();
                 void sendMessage();
@@ -167,6 +183,7 @@ export function AskEvi() {
                 onChange={(event) => setDraft(event.target.value.slice(0, MAX_MESSAGE_LENGTH))}
                 maxLength={MAX_MESSAGE_LENGTH}
                 disabled={pending}
+                aria-describedby={`${inputId}-privacy`}
                 placeholder="z. B. Was kann Evi eigentlich?"
                 autoComplete="off"
                 className="min-h-12 w-full rounded-2xl border border-border bg-surface px-4 text-base text-text-primary placeholder:text-text-secondary focus:border-accent focus:outline-none disabled:opacity-60"
@@ -184,13 +201,12 @@ export function AskEvi() {
 
         <Reveal delay={160}>
           <p className="mx-auto mt-5 max-w-2xl text-center text-[0.8125rem] leading-relaxed text-text-secondary">
-            Automatisiert und nur zum Produkt Evi — keine Beratung und keine
-            Nothilfe.{" "}
+            Automatisierte Produktvorschau — keine Beratung oder Nothilfe.{" "}
             <Link
               href="/akute-hilfe"
               className="font-medium text-link underline underline-offset-2"
             >
-              Wege zu akuter Hilfe
+              Akute Hilfe
             </Link>
             .
           </p>

@@ -83,6 +83,11 @@ Zielgruppen-Details (z. B. wer genau zuerst eingeladen wird) sind nicht
 - Statistik (Analytics) läuft nur nach ausdrücklicher Zustimmung der
   besuchenden Person; was jemand in ein Formular schreibt, geht nie in die
   Statistik.
+- Der Chat "Frag Evi selbst" ist nur für Fragen zum Produkt gedacht. Beim
+  Senden gehen die Frage und der kurze bisherige Chatverlauf zur
+  Antwortgenerierung an die OpenAI API. Evi speichert diesen Chat nicht in
+  einer eigenen Datenbank. Nutzer:innen sollen dort keine Namen,
+  Kontaktdaten oder Gesundheitsinformationen eingeben.
 - Details stehen in der Datenschutzerklärung (`/datenschutz`).
 
 ## Wer steckt dahinter

@@ -1,7 +1,7 @@
 import {
   askEvi,
   isEviChatConfigured,
-} from "@/lib/evi-chat/anthropic-client.server";
+} from "@/lib/evi-chat/openai-client.server";
 import {
   clientKeyFromHeaders,
   isRateLimited,
@@ -13,7 +13,7 @@ import {
 import { validateChatRequest } from "@/lib/evi-chat/validation";
 
 /**
- * Backs the "Frag Evi selbst" widget on the landing page.
+ * Backs the standalone "Frag Evi selbst" product-Q&A page.
  *
  * Stateless: the client resends the (capped) conversation every turn, and
  * nothing here is written to a database or a log. On any failure — missing
@@ -49,7 +49,7 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   if (!isEviChatConfigured()) {
-    console.error("[evi-chat] ANTHROPIC_API_KEY is not set — falling back.");
+    console.error("[evi-chat] OPENAI_API_KEY is not set — falling back.");
     return Response.json({ reply: FALLBACK_REPLY, fallback: true });
   }
 
