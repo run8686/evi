@@ -134,6 +134,10 @@ export function Hero() {
           </a>
         </div>
 
+        <p className="text-sm font-medium text-white/80">
+          Für dich ohne Kosten – heute und auch in Zukunft.
+        </p>
+
         <div className="flex items-center gap-3">
           {/* Arrows are desktop-only: on a phone the thumb has the bars. */}
           <button
